@@ -1,0 +1,318 @@
+openapi: 3.0.0
+info:
+  title: My Application
+  version: 1.0.0
+paths:
+  "/templates":
+    get:
+      tags:
+      - "Templates"
+      summary: Retrieve a list of all templates
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Template'
+    post:
+      tags:
+        - "Templates"
+      summary: Create a new template
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Template'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Template'
+  "/templates/{id}":
+    parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+    get:
+      tags:
+        - "Templates"
+      summary: Retrieve a specific template by ID
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Template'
+              example:
+                $ref: '#/components/examples/Template'
+        '404':
+          description: Template not found
+    delete:
+      tags:
+        - "Templates"
+      summary: Delete a specific template by ID
+      responses:
+        '204':
+          description: No content
+        '404':
+          description: Template not found
+  "/answers":
+    get:
+      tags:
+        - "Answers"
+      summary: Retrieve a list of all answers
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Answer'
+    post:
+      tags:
+        - "Answers"
+      summary: Create a new answer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Answer'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Answer'
+  "/answers/{id}":
+    get:
+      tags:
+        - "Answers"
+      summary: Retrieve a specific answer by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Answer'
+        '404':
+          description: Answer not found
+    delete:
+      tags:
+        - "Answers"
+      summary: Delete a specific answer by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No content
+        '404':
+          description: Answer not found
+  "/answers/template/{id}":
+    get:
+      tags:
+        - "Answers"
+      summary: Retrieve a list of all answers for a specific template
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Answer'
+        '404':
+          description: Template not found
+    delete:
+      tags:
+        - "Answers"
+      summary: Delete all answers for a specific template
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No content
+components:
+  examples:
+    Template:
+      value:
+        id: "1"
+        name: "Deforestation Awareness Survey"
+        user: "abc123"
+        createdAt: "2022-04-19T10:05:24Z"
+        questions:
+          - title: "How concerned are you about deforestation?"
+            type: "radio"
+            options:
+              - display: "Extremely concerned"
+                value: "5"
+              - display: "Very concerned"
+                value: "4"
+              - display: "Somewhat concerned"
+                value: "3"
+              - display: "Slightly concerned"
+                value: "2"
+              - display: "Not concerned at all"
+                value: "1"
+            required: true
+          - title: "Have you ever taken any action to reduce deforestation?"
+            type: "boolean"
+            required: true
+          - title: "In your opinion, what is the most significant cause of deforestation?"
+            type: "select"
+            options:
+              - display: "Agricultural expansion"
+                value: "Agricultural expansion"
+              - display: "Logging"
+                value: "Logging"
+              - display: "Mining"
+                value: "Mining"
+              - display: "Road construction"
+                value: "Road construction"
+              - display: "Other"
+                value: "Other"
+            required: true
+          - title: "Please explain your answer to the previous question in more detail."
+            type: "text"
+            required: false
+          - title: "Do you believe that individuals can make a difference in reducing deforestation?"
+            type: "boolean"
+            required: true
+          - title: "If you answered 'yes' to the previous question, what actions do you believe individuals can take to reduce deforestation?"
+            type: "text"
+            required: false
+
+  schemas:
+    Template:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier for the template
+        name:
+          type: string
+          description: The name of the template
+        user:
+          type: string
+          description: The unique identifier for the user who created the template
+        createdAt:
+          type: string
+          format: date-time
+          description: The date and time when the template was created
+        questions:
+          type: array
+          items:
+            type: object
+            properties:
+              title:
+                type: string
+                description: The title of the question
+              type:
+                type: string
+                enum:
+                  - text
+                  - number
+                  - boolean
+                  - select
+                  - radio
+                  - image
+                  - audio
+                description: The type of the question
+              options:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    display:
+                      type: string
+                      description: The text to display for the option
+                    value:
+                      type: string
+                      description: The value of the option
+                description: The options for the question, if applicable
+              required:
+                type: boolean
+                description: Whether or not this question is required
+            required:
+              - title
+              - type
+              - required
+          description: The questions for the template
+      required:
+        - id
+        - name
+        - user
+        - createdAt
+        - questions
+    Answer:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier for the answer
+        templateId:
+          type: string
+          description: The unique identifier for the template this answer belongs to
+        userId:
+          type: string
+          description: The unique identifier for the user who created this answer
+        responses:
+          type: object
+          additionalProperties:
+            type: string
+      required:
+        - id
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier for the user
+        name:
+          type: string
+          description: The user's name
+        email:
+          type: string
+          description: The user's email address
+        password:
+          type: string
+          description: The user's password (hashed)
+      required:
+        - id
+
+
